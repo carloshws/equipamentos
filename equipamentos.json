@@ -1,0 +1,294 @@
+[
+  {
+    "name": "Estação Total Leica TS06",
+    "serial": "440882"
+  },
+  {
+    "name": "Estação Total Leica TS06",
+    "serial": "440883"
+  },
+  {
+    "name": "Estação Total Leica TS06",
+    "serial": "440884"
+  },
+  {
+    "name": "Estação Total Leica TS06",
+    "serial": "440885"
+  },
+  {
+    "name": "Estação Total Leica TS06",
+    "serial": "440886"
+  },
+  {
+    "name": "Estação Total Leica TS06",
+    "serial": "440887"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440888"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440889"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440890"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440891"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440892"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440893"
+  },
+  {
+    "name": "Nível Eletrônico Sprinter",
+    "serial": "440894"
+  },
+  {
+    "name": "KIT GNSS RTK Leica Viva GS15",
+    "serial": "440895"
+  },
+  {
+    "name": "Bússula",
+    "serial": "BUS1"
+  },
+  {
+    "name": "Bússula",
+    "serial": "BUS2"
+  },
+  {
+    "name": "Bússula",
+    "serial": "BUS3"
+  },
+  {
+    "name": "Bússula",
+    "serial": "BUS4"
+  },
+  {
+    "name": "Trena 50 m",
+    "serial": "TRENA1"
+  },
+  {
+    "name": "Trena 50 m",
+    "serial": "TRENA2"
+  },
+  {
+    "name": "Trena 50 m",
+    "serial": "TRENA3"
+  },
+  {
+    "name": "Trena 50 m",
+    "serial": "TRENA4"
+  },
+  {
+    "name": "Trena 50 m",
+    "serial": "TRENA5"
+  },
+  {
+    "name": "Prancheta Plástica",
+    "serial": "PRAN1"
+  },
+  {
+    "name": "Prancheta Plástica",
+    "serial": "PRAN2"
+  },
+  {
+    "name": "Prancheta Plástica",
+    "serial": "PRAN3"
+  },
+  {
+    "name": "Prancheta Plástica",
+    "serial": "PRAN4"
+  },
+  {
+    "name": "Prancheta Plástica",
+    "serial": "PRAN5"
+  },
+  {
+    "name": "Prisma",
+    "serial": "PRISMA1"
+  },
+  {
+    "name": "Prisma",
+    "serial": "PRISMA2"
+  },
+  {
+    "name": "Prisma",
+    "serial": "PRISMA3"
+  },
+  {
+    "name": "Prisma",
+    "serial": "PRISMA4"
+  },
+  {
+    "name": "Prisma",
+    "serial": "PRISMA5"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT1"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT2"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT3"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT4"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT5"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT6"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT7"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT8"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT9"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT10"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT11"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT12"
+  },
+  {
+    "name": "Bateria Estação",
+    "serial": "BAT13"
+  },
+  {
+    "name": "Mira Estadimétrica",
+    "serial": "MIRA1"
+  },
+  {
+    "name": "Mira Estadimétrica",
+    "serial": "MIRA2"
+  },
+  {
+    "name": "Mira Estadimétrica",
+    "serial": "MIRA3"
+  },
+  {
+    "name": "Mira Estadimétrica",
+    "serial": "MIRA4"
+  },
+  {
+    "name": "Mira Estadimétrica",
+    "serial": "MIRA5"
+  },
+  {
+    "name": "Tripé",
+    "serial": "TRIPÉ1"
+  },
+  {
+    "name": "Tripé",
+    "serial": "TRIPÉ2"
+  },
+  {
+    "name": "Tripé",
+    "serial": "TRIPÉ3"
+  },
+  {
+    "name": "Tripé",
+    "serial": "TRIPÉ4"
+  },
+  {
+    "name": "Tripé",
+    "serial": "TRIPÉ5"
+  },
+  {
+    "name": "Bipé",
+    "serial": "BIPÉ1"
+  },
+  {
+    "name": "Bipé",
+    "serial": "BIPÉ2"
+  },
+  {
+    "name": "Bipé",
+    "serial": "BIPÉ3"
+  },
+  {
+    "name": "Bipé",
+    "serial": "BIPÉ4"
+  },
+  {
+    "name": "Bipé",
+    "serial": "BIPÉ5"
+  },
+  {
+    "name": "Bastão Prisma",
+    "serial": "BP1"
+  },
+  {
+    "name": "Bastão Prisma",
+    "serial": "BP2"
+  },
+  {
+    "name": "Bastão Prisma",
+    "serial": "BP3"
+  },
+  {
+    "name": "Bastão Prisma",
+    "serial": "BP4"
+  },
+  {
+    "name": "Bastão Prisma",
+    "serial": "BP5"
+  },
+  {
+    "name": "Bastão GNSS",
+    "serial": "BT1"
+  },
+  {
+    "name": "Bastão GNSS",
+    "serial": "BT2"
+  },
+  {
+    "name": "Bastão GNSS",
+    "serial": "BT3"
+  },
+  {
+    "name": "Bastão GNSS",
+    "serial": "BT4"
+  },
+  {
+    "name": "Bastão GNSS",
+    "serial": "BT5"
+  },
+  {
+    "name": "GNSS GARMIN MONTANA 700",
+    "serial": "525396"
+  },
+  {
+    "name": "GNSS Leica Viva GS15",
+    "serial": "GNSS 1"
+  }
+]
