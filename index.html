@@ -735,6 +735,9 @@
       
       historyData = loadHistory();
       
+      // Sincronização crítica: atualiza status dos equipamentos baseado no histórico
+      syncEquipmentStatus();
+      
     } catch (error) {
       console.error('❌ Erro ao carregar dados:', error);
       
@@ -751,6 +754,36 @@
       indicator.innerHTML = '<i class="fas fa-times-circle text-red-500 mr-2"></i><span class="text-red-800 font-medium">Erro no carregamento</span>';
       indicator.className = 'bg-red-100 px-4 py-2 rounded-lg';
     }
+  }
+
+  /* ======== EQUIPMENT STATUS SYNCHRONIZATION ======== */
+  function syncEquipmentStatus() {
+    console.log('🔄 Sincronizando status dos equipamentos...');
+    
+    // Primeiro, define todos como disponíveis
+    equipData.forEach(equip => {
+      equip.status = 'Disponível';
+      equip.users = [];
+    });
+
+    // Depois, atualiza baseado nos empréstimos em aberto do histórico
+    const openLoans = historyData.filter(h => !h.dateIn);
+    console.log('Empréstimos em aberto encontrados:', openLoans.length);
+
+    openLoans.forEach(loan => {
+      loan.items.forEach(item => {
+        const equipment = equipData.find(e => e.serial === item.serial);
+        if (equipment) {
+          equipment.status = 'Emprestado';
+          equipment.users = [...loan.users]; // Copia dos usuários
+          console.log(`✅ Equipamento ${equipment.name} (${equipment.serial}) marcado como emprestado para:`, loan.users);
+        } else {
+          console.warn(`⚠️ Equipamento não encontrado no inventário: ${item.name} (${item.serial})`);
+        }
+      });
+    });
+
+    console.log('✅ Sincronização concluída');
   }
 
   /* ======== DOM REFERENCES ======== */
@@ -815,6 +848,58 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /* ======== DEBUG FUNCTIONS ======== */
+  window.debugSystem = function() {
+    console.group('🔍 Debug do Sistema de Equipamentos');
+    
+    console.log('📊 Estatísticas:');
+    console.table({
+      'Total de Equipamentos': equipData.length,
+      'Equipamentos Disponíveis': equipData.filter(e => e.status === 'Disponível').length,
+      'Equipamentos Emprestados': equipData.filter(e => e.status === 'Emprestado').length,
+      'Total de Estudantes': studentData.length,
+      'Registros de Histórico': historyData.length,
+      'Empréstimos em Aberto': historyData.filter(h => !h.dateIn).length
+    });
+    
+    console.log('🔧 Equipamentos Emprestados:');
+    const loanedEquip = equipData.filter(e => e.status === 'Emprestado');
+    if (loanedEquip.length > 0) {
+      console.table(loanedEquip.map(e => ({
+        Nome: e.name,
+        Serial: e.serial,
+        Categoria: e.category,
+        Usuários: e.users.join(', ')
+      })));
+    } else {
+      console.log('Nenhum equipamento emprestado no momento.');
+    }
+    
+    console.log('👥 Alunos Ativos:');
+    const activeStudents = new Set();
+    equipData.filter(e => e.status === 'Emprestado').forEach(e => {
+      e.users.forEach(user => activeStudents.add(user));
+    });
+    console.log('Lista:', Array.from(activeStudents));
+    console.log('Total:', activeStudents.size);
+    
+    console.log('📋 Empréstimos em Aberto:');
+    const openLoans = historyData.filter(h => !h.dateIn);
+    if (openLoans.length > 0) {
+      console.table(openLoans.map(h => ({
+        Equipamentos: h.items.map(i => `${i.name} (${i.serial})`).join(', '),
+        Usuários: h.users.join(', '),
+        'Data Saída': h.dateOut,
+        Observações: h.obs || 'Nenhuma'
+      })));
+    } else {
+      console.log('Nenhum empréstimo em aberto.');
+    }
+    
+    console.groupEnd();
+    return 'Debug completo! Verifique o console para detalhes.';
+  };
+
   function updateCurrentDate() {
     const now = new Date();
     const options = { 
@@ -827,31 +912,75 @@
   }
 
   function animateNumber(element, target, duration = 1000) {
+    // Guard clause
+    if (!element) {
+      console.warn('Elemento não encontrado para animação de número');
+      return;
+    }
+
+    // Cancela uma animação anterior no mesmo elemento, se existir
+    if (element.dataset.timerId) {
+      clearInterval(+element.dataset.timerId);
+    }
+
     const start = parseInt(element.textContent) || 0;
     const increment = (target - start) / (duration / 16);
     let current = start;
-    
+
     const timer = setInterval(() => {
       current += increment;
       if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
         current = target;
         clearInterval(timer);
+        delete element.dataset.timerId;
       }
       element.textContent = Math.floor(current);
     }, 16);
+
+    // Armazena o id para permitir cancelamento futuro
+    element.dataset.timerId = timer;
   }
 
   /* ======== STATS UPDATE ======== */
   function updateStats() {
+    // Debug logging
+    console.log('Atualizando estatísticas...', {
+      totalEquipamentos: equipData.length,
+      equipamentosEmprestados: equipData.filter(e => e.status === 'Emprestado').length,
+      equipamentosDisponiveis: equipData.filter(e => e.status === 'Disponível').length
+    });
+
     const total = equipData.length;
-    const available = equipData.filter(e => e.status === 'Disponível').length;
-    const loaned = equipData.filter(e => e.status === 'Emprestado').length;
-    
+    // Contagem robusta baseada no histórico em aberto
+    const openLoans = historyData.filter(h => !h.dateIn);
+    const loaned = openLoans.reduce((total, l) => total + l.items.length, 0);
+
     const activeStudents = new Set();
-    equipData.filter(e => e.status === 'Emprestado').forEach(e => {
-      e.users.forEach(user => activeStudents.add(user));
+    openLoans.forEach(l => {
+      if (Array.isArray(l.users)) {
+        l.users.forEach(u => {
+          if (u && u.trim()) activeStudents.add(u.trim());
+        });
+      }
     });
     const activeStudentCount = activeStudents.size;
+
+    // Também recalcula disponíveis
+    const available = Math.max(total - loaned, 0);
+
+    // Debug logging for student count
+    console.log('Alunos ativos identificados:', Array.from(activeStudents));
+    console.log('Total de alunos ativos:', activeStudentCount);
+
+    // Verificação de integridade
+    if (available + loaned !== total) {
+      console.warn('⚠️ Inconsistência detectada nas contagens!', {
+        total,
+        available,
+        loaned,
+        soma: available + loaned
+      });
+    }
 
     // Animate main stats
     animateNumber(document.getElementById('totalEquip'), total);
@@ -865,13 +994,23 @@
 
     // Update progress bars
     setTimeout(() => {
-      const availablePercentage = total > 0 ? (available / total) * 100 : 0;
-      const loanedPercentage = total > 0 ? (loaned / total) * 100 : 0;
-      const studentsPercentage = Math.min((activeStudentCount / 40) * 100, 100); // Max 40 students
+      const availablePercentage = total > 0 ? Math.round((available / total) * 100) : 0;
+      const loanedPercentage = total > 0 ? Math.round((loaned / total) * 100) : 0;
+      const studentsPercentage = Math.min(Math.round((activeStudentCount / 40) * 100), 100); // Max 40 students
 
-      document.getElementById('availableProgress').style.width = `${availablePercentage}%`;
-      document.getElementById('loanedProgress').style.width = `${loanedPercentage}%`;
-      document.getElementById('studentsProgress').style.width = `${studentsPercentage}%`;
+      const availableProgressEl = document.getElementById('availableProgress');
+      const loanedProgressEl = document.getElementById('loanedProgress');
+      const studentsProgressEl = document.getElementById('studentsProgress');
+
+      if (availableProgressEl) availableProgressEl.style.width = `${availablePercentage}%`;
+      if (loanedProgressEl) loanedProgressEl.style.width = `${loanedPercentage}%`;
+      if (studentsProgressEl) studentsProgressEl.style.width = `${studentsPercentage}%`;
+
+      console.log('Progress bars atualizadas:', {
+        availablePercentage,
+        loanedPercentage,
+        studentsPercentage
+      });
     }, 500);
   }
 
@@ -1080,7 +1219,11 @@
     if (confirm('Tem certeza que deseja apagar todo o histórico de empréstimos?')) {
       historyData = [];
       saveHistory();
-      renderHistory();
+      
+      // Sincroniza status dos equipamentos após limpar histórico
+      syncEquipmentStatus();
+      
+      renderAll(); // Renderiza tudo, não apenas o histórico
       showToast('Histórico de empréstimos limpo', 'info');
     }
   };
