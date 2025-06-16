@@ -1,5 +1,4 @@
 window.ALUNOS_DATA = [
-  { "nome": "﻿Nome", "matricula": "Matricula" },
   { "nome": "ADAO GABRIEL DOS PASSOS", "matricula": "GRR20256268" },
   { "nome": "ALAN KALANI WAISMANN", "matricula": "GRR20234068" },
   { "nome": "AMANDA BEATRIZ DA SILVA PAIVA", "matricula": "GRR20202479" },
