@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab. de Geotecnologias - Sistema de Controle de Equipamentos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e'
+            },
+            secondary: {
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
+    .animate-slide-in { animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+  <!-- HEADER -->
+  <header class="bg-white shadow-lg border-b-4 border-primary-500">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="bg-primary-500 p-3 rounded-xl">
+            <i class="fas fa-microscope text-white text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-800">Lab. de Geotecnologias</h1>
+            <p class="text-gray-600 text-sm">Sistema de Controle de Equipamentos</p>
+          </div>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="bg-green-100 px-4 py-2 rounded-lg">
+            <i class="fas fa-circle text-green-500 mr-2"></i>
+            <span class="text-green-800 font-medium">Sistema Online</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <!-- QUICK STATS -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm">Total de Equipamentos</p>
+            <p id="totalEquip" class="text-2xl font-bold text-gray-800">0</p>
+          </div>
+          <div class="bg-blue-100 p-3 rounded-lg">
+            <i class="fas fa-tools text-blue-600"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm">Disponíveis</p>
+            <p id="availableEquip" class="text-2xl font-bold text-green-600">0</p>
+          </div>
+          <div class="bg-green-100 p-3 rounded-lg">
+            <i class="fas fa-check-circle text-green-600"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm">Emprestados</p>
+            <p id="loanedEquip" class="text-2xl font-bold text-orange-600">0</p>
+          </div>
+          <div class="bg-orange-100 p-3 rounded-lg">
+            <i class="fas fa-clock text-orange-600"></i>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm">Alunos Ativos</p>
+            <p id="activeStudents" class="text-2xl font-bold text-purple-600">0</p>
+          </div>
+          <div class="bg-purple-100 p-3 rounded-lg">
+            <i class="fas fa-users text-purple-600"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPRÉSTIMO/DEVOLUÇÃO -->
+    <section class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-4">
+        <h2 class="text-xl font-semibold text-white flex items-center">
+          <i class="fas fa-exchange-alt mr-3"></i>
+          Empréstimo e Devolução de Equipamentos
+        </h2>
+      </div>
+      <div class="p-6">
+        <form id="loanForm" class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- EQUIPAMENTOS -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-tools mr-2 text-primary-500"></i>
+                Selecionar Equipamentos
+              </label>
+              <div class="relative">
+                <select id="equipmentSelect" multiple size="8" required 
+                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-200">
+                </select>
+                <div class="absolute top-2 right-2 bg-primary-100 text-primary-600 text-xs px-2 py-1 rounded">
+                  Ctrl + clique
+                </div>
+              </div>
+            </div>
+
+            <!-- ALUNOS -->
+            <div class="space-y-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                <i class="fas fa-user-graduate mr-2 text-secondary-500"></i>
+                Selecionar Alunos Responsáveis
+              </label>
+              <select id="studentSelect" multiple size="8" required 
+                      class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-200">
+              </select>
+            </div>
+
+            <!-- AÇÕES -->
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2" for="dateOut">
+                  <i class="fas fa-calendar mr-2 text-orange-500"></i>
+                  Data de Saída
+                </label>
+                <input id="dateOut" type="date" required 
+                       class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all duration-200">
+              </div>
+              <button type="submit" 
+                      class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-primary-600 hover:to-primary-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                <i class="fas fa-check mr-2"></i>
+                Confirmar Empréstimo
+              </button>
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="font-semibold text-blue-800 mb-2">
+                  <i class="fas fa-info-circle mr-2"></i>
+                  Como usar:
+                </h4>
+                <ul class="text-sm text-blue-700 space-y-1">
+                  <li>• Selecione múltiplos equipamentos com Ctrl + clique</li>
+                  <li>• Escolha os alunos responsáveis</li>
+                  <li>• Defina a data de saída</li>
+                  <li>• Clique em "Confirmar Empréstimo"</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- INVENTÁRIO -->
+    <section class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-secondary-500 to-secondary-600 px-6 py-4 flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-white flex items-center">
+          <i class="fas fa-clipboard-list mr-3"></i>
+          Inventário de Equipamentos
+        </h2>
+        <div class="flex items-center space-x-4">
+          <select id="categoryFilter" class="bg-white text-gray-700 px-3 py-1 rounded-lg text-sm">
+            <option value="">Todas as categorias</option>
+          </select>
+          <div class="bg-white bg-opacity-20 px-3 py-1 rounded-lg">
+            <span id="equipCount" class="text-white font-medium">0 equipamentos</span>
+          </div>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Equipamento</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Categoria</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nº Série</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Responsáveis</th>
+              <th class="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-gray-200">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- HISTÓRICO -->
+    <section class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-purple-500 to-purple-600 px-6 py-4 flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-white flex items-center">
+          <i class="fas fa-history mr-3"></i>
+          Histórico de Empréstimos
+        </h2>
+        <button id="clearBtn" 
+                class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors duration-200 flex items-center">
+          <i class="fas fa-trash-alt mr-2"></i>
+          Limpar Histórico
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Equipamentos</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Alunos</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data Saída</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Data Devolução</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Observações</th>
+            </tr>
+          </thead>
+          <tbody id="histBody" class="divide-y divide-gray-200">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-300 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <div class="flex items-center justify-center space-x-4 mb-2">
+        <i class="fas fa-university"></i>
+        <span>&copy; 2025 UFPR - Universidade Federal do Paraná</span>
+      </div>
+      <p class="text-sm text-gray-400">Sistema de Controle de Equipamentos - Lab. de Geotecnologias</p>
+    </div>
+  </footer>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl">
+      <div class="flex items-center space-x-3">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+        <span class="text-gray-700">Carregando dados...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ======== DATA MANAGEMENT ======== */
+  let equipData = [];
+  let studentData = [];
+  let historyData = [];
+  
+  const HKEY = 'loanHistory';
+  const loadHistory = () => {
+    try {
+      const data = JSON.parse(localStorage.getItem(HKEY));
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  };
+
+  /* ======== FILE LOADING ======== */
+  async function loadDataFiles() {
+    try {
+      const [equipResponse, studentResponse] = await Promise.all([
+        fetch('./equipamentos.json'),
+        fetch('./alunos.json')
+      ]);
+      
+      if (equipResponse.ok) {
+        equipData = await equipResponse.json();
+        equipData = equipData.map(e => ({
+          ...e,
+          status: e.status || 'Disponível',
+          users: Array.isArray(e.users) ? e.users : []
+        }));
+      } else {
+        throw new Error('Failed to load equipment data');
+      }
+      
+      if (studentResponse.ok) {
+        studentData = await studentResponse.json();
+      } else {
+        throw new Error('Failed to load student data');
+      }
+      
+      historyData = loadHistory();
+      
+    } catch (error) {
+      console.warn('Error loading JSON files, using fallback data:', error);
+      // Fallback data
+      equipData = [
+        {name:'Estação Total Leica TS06', serial:'440882', category:'Topografia', status:'Disponível', users:[]},
+        {name:'Estação Total Leica TS06', serial:'440883', category:'Topografia', status:'Disponível', users:[]},
+        {name:'Receptor GNSS Trimble', serial:'GNSS-12', category:'GNSS', status:'Disponível', users:[]}
+      ];
+      studentData = [
+        {nome:'ADAO GABRIEL DOS PASSOS', matricula:'GRR20210001', curso:'Engenharia Cartográfica', email:'adao@ufpr.br'},
+        {nome:'ALAN KALANI WAISMANN', matricula:'GRR20210002', curso:'Engenharia Cartográfica', email:'alan@ufpr.br'},
+        {nome:'AMANDA BEATRIZ DA SILVA PAIVA', matricula:'GRR20210003', curso:'Engenharia Cartográfica', email:'amanda@ufpr.br'}
+      ];
+      historyData = loadHistory();
+    }
+  }
+
+  /* ======== DOM REFERENCES ======== */
+  const equipSel = document.getElementById('equipmentSelect');
+  const studSel = document.getElementById('studentSelect');
+  const tbody = document.getElementById('tableBody');
+  const histBody = document.getElementById('histBody');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+
+  /* ======== UTILITY FUNCTIONS ======== */
+  const today = () => new Date().toLocaleDateString('pt-BR');
+  const saveHistory = () => localStorage.setItem(HKEY, JSON.stringify(historyData));
+
+  /* ======== STATS UPDATE ======== */
+  function updateStats() {
+    document.getElementById('totalEquip').textContent = equipData.length;
+    document.getElementById('availableEquip').textContent = equipData.filter(e => e.status === 'Disponível').length;
+    document.getElementById('loanedEquip').textContent = equipData.filter(e => e.status === 'Emprestado').length;
+    
+    const activeStudents = new Set();
+    equipData.filter(e => e.status === 'Emprestado').forEach(e => {
+      e.users.forEach(user => activeStudents.add(user));
+    });
+    document.getElementById('activeStudents').textContent = activeStudents.size;
+  }
+
+  /* ======== RENDER FUNCTIONS ======== */
+  function renderSelects() {
+    // Equipment select
+    equipSel.innerHTML = '';
+    const availableEquip = equipData.filter(e => e.status === 'Disponível');
+    availableEquip.forEach((e, i) => {
+      const originalIndex = equipData.indexOf(e);
+      const option = document.createElement('option');
+      option.value = originalIndex;
+      option.innerHTML = `<i class="fas fa-tools"></i> ${e.name} (${e.serial}) - ${e.category}`;
+      option.textContent = `${e.name} (${e.serial}) - ${e.category}`;
+      equipSel.appendChild(option);
+    });
+
+    // Student select
+    studSel.innerHTML = '';
+    studentData.forEach(s => {
+      const option = document.createElement('option');
+      option.value = s.nome;
+      option.textContent = `${s.nome} (${s.matricula})`;
+      studSel.appendChild(option);
+    });
+
+    // Category filter
+    const categories = [...new Set(equipData.map(e => e.category))];
+    categoryFilter.innerHTML = '<option value="">Todas as categorias</option>';
+    categories.forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      categoryFilter.appendChild(option);
+    });
+  }
+
+  function renderInventory() {
+    const selectedCategory = categoryFilter.value;
+    const filteredEquip = selectedCategory ? 
+      equipData.filter(e => e.category === selectedCategory) : 
+      equipData;
+
+    tbody.innerHTML = '';
+    filteredEquip.forEach((e, i) => {
+      const originalIndex = equipData.indexOf(e);
+      const statusClass = e.status === 'Disponível' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800';
+      const statusIcon = e.status === 'Disponível' ? 'fas fa-check-circle' : 'fas fa-clock';
+      
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-gray-50 transition-colors duration-150';
+      row.innerHTML = `
+        <td class="px-6 py-4">
+          <div class="flex items-center">
+            <div class="bg-primary-100 p-2 rounded-lg mr-3">
+              <i class="fas fa-tools text-primary-600"></i>
+            </div>
+            <div>
+              <div class="font-medium text-gray-900">${e.name}</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            ${e.category}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-900 font-mono">${e.serial}</td>
+        <td class="px-6 py-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusClass}">
+            <i class="${statusIcon} mr-1"></i>
+            ${e.status}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-700">${e.users.join(', ')}</td>
+        <td class="px-6 py-4 text-center">
+          ${e.status === 'Emprestado' ? 
+            `<button class='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm transition-colors duration-200 flex items-center mx-auto' onclick='checkIn(${originalIndex})'>
+              <i class="fas fa-undo mr-1"></i>
+              Devolver
+            </button>` : 
+            '<span class="text-gray-400 text-sm">-</span>'
+          }
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    document.getElementById('equipCount').textContent = `${filteredEquip.length} equipamento(s)`;
+  }
+
+  function renderHistory() {
+    histBody.innerHTML = '';
+    const sortedHistory = [...historyData].reverse();
+    
+    sortedHistory.forEach(h => {
+      const equipList = h.items.map(it => `${it.name} (${it.serial})`).join('<br>');
+      const usersList = h.users.join('<br>');
+      
+      const row = document.createElement('tr');
+      row.className = 'hover:bg-gray-50 transition-colors duration-150';
+      row.innerHTML = `
+        <td class="px-6 py-4 text-sm text-gray-900">${equipList}</td>
+        <td class="px-6 py-4 text-sm text-gray-700">${usersList}</td>
+        <td class="px-6 py-4 text-sm text-gray-900">${h.dateOut}</td>
+        <td class="px-6 py-4 text-sm">
+          ${h.dateIn ? 
+            `<span class="text-green-600 font-medium">${h.dateIn}</span>` : 
+            '<span class="text-orange-500 font-medium">Em aberto</span>'
+          }
+        </td>
+        <td class="px-6 py-4 text-sm text-gray-700">${h.obs || '-'}</td>
+      `;
+      histBody.appendChild(row);
+    });
+  }
+
+  function renderAll() {
+    renderSelects();
+    renderInventory();
+    renderHistory();
+    updateStats();
+  }
+
+  /* ======== EVENT HANDLERS ======== */
+  document.getElementById('loanForm').addEventListener('submit', ev => {
+    ev.preventDefault();
+    const idxs = [...equipSel.selectedOptions].map(o => +o.value);
+    if (!idxs.length) return alert('Selecione pelo menos um equipamento.');
+    
+    const users = [...studSel.selectedOptions].map(o => o.value);
+    if (!users.length) return alert('Selecione pelo menos um aluno responsável.');
+    
+    const dateOut = document.getElementById('dateOut').value;
+    if (!dateOut) return alert('Informe a data de saída.');
+
+    // Update equipment status
+    const items = [];
+    idxs.forEach(idx => {
+      const item = equipData[idx];
+      item.status = 'Emprestado';
+      item.users = users;
+      items.push({name: item.name, serial: item.serial});
+    });
+
+    // Add to history
+    historyData.push({
+      items,
+      users,
+      dateOut,
+      dateIn: '',
+      obs: ''
+    });
+
+    saveHistory();
+    ev.target.reset();
+    renderAll();
+
+    // Success animation
+    const button = ev.target.querySelector('button[type="submit"]');
+    button.innerHTML = '<i class="fas fa-check mr-2"></i>Empréstimo Confirmado!';
+    button.classList.add('bg-green-500');
+    setTimeout(() => {
+      button.innerHTML = '<i class="fas fa-check mr-2"></i>Confirmar Empréstimo';
+      button.classList.remove('bg-green-500');
+    }, 2000);
+  });
+
+  window.checkIn = idx => {
+    const note = prompt('Observações sobre a devolução (opcional):', '');
+    const item = equipData[idx];
+    
+    item.status = 'Disponível';
+    item.users = [];
+
+    // Update history
+    for (let i = historyData.length - 1; i >= 0; i--) {
+      const h = historyData[i];
+      if (!h.dateIn && h.items.some(itm => itm.serial === item.serial)) {
+        h.dateIn = today();
+        if (note && note.trim()) h.obs = note.trim();
+        break;
+      }
+    }
+
+    saveHistory();
+    renderAll();
+  };
+
+  document.getElementById('clearBtn').onclick = () => {
+    if (confirm('Tem certeza que deseja apagar todo o histórico de empréstimos?')) {
+      historyData = [];
+      saveHistory();
+      renderHistory();
+    }
+  };
+
+  categoryFilter.addEventListener('change', renderInventory);
+
+  /* ======== INITIALIZATION ======== */
+  async function init() {
+    await loadDataFiles();
+    renderAll();
+    loadingOverlay.style.display = 'none';
+    
+    // Set today's date as default
+    document.getElementById('dateOut').valueAsDate = new Date();
+  }
+
+  // Start the application
+  init();
+  </script>
+</body>
+</html>
